@@ -4,8 +4,9 @@
 #include "byte_stream.hh"
 
 #include <cstdint>
+#include <limits>
 #include <string>
-
+#include <vector>
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
 class StreamReassembler {
@@ -15,6 +16,12 @@ class StreamReassembler {
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
 
+    std::vector<char> _buf;
+    std::vector<bool> _valid;  //!< Whether the byte at a particular index has been pushed
+    size_t _cur_index;         //!< The index of the next byte to be assembled
+    size_t _eof_idx;           //!< The index of the last byte in the entire stream (if known)
+
+    size_t _unassembled_bytes_cnt;  //!< The number of bytes in the substrings stored but not yet reassembled
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
