@@ -2,7 +2,7 @@
 #define SPONGE_LIBSPONGE_BYTE_STREAM_HH
 
 #include <string>
-
+#include <vector>
 //! \brief An in-order byte stream.
 
 //! Bytes are written on the "input" side and read from the "output"
@@ -16,8 +16,13 @@ class ByteStream {
     // all, but if any of your tests are taking longer than a second,
     // that's a sign that you probably want to keep exploring
     // different approaches.
-
-    bool _error{};  //!< Flag indicating that the stream suffered an error.
+    std::vector<char> _buffer;       // 环形缓冲区，存储实际数据
+    size_t _capacity;                // 缓冲区的最大容量（构造函数传入）
+    size_t _written_cnt;             // 总共写入的字节数（累计）
+    size_t _read_cnt;                // 总共读取的字节数（累计）
+    int _head, _tail;                // 环形队列的头尾指针（读/写位置）
+    bool _input_ended_flag = false;  // 是否调用了 end_input()（不再写入）
+    bool _error = false;             // 是否发生错误（如容量溢出）
 
   public:
     //! Construct a stream with room for `capacity` bytes.
